@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BloodLink BD</title>
+<style>
+:root{--bg:#fff;--card:#fff;--tx:#1d1d20;--mu:#6b6b76;--bd:#e7e5e8;--ac:#b3122d;--ac2:#fdecef;--ok:#16794a;--no:#8a6d00}
+[data-t=dark]{--bg:#121214;--card:#1b1b1f;--tx:#f1f1f3;--mu:#a0a0aa;--bd:#2c2c33;--ac:#e0475f;--ac2:#2a1519;--ok:#4cc38a;--no:#e0b84c}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--tx)}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--bg);z-index:5}
+main{max-width:980px;margin:0 auto;padding:16px 16px 90px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--bg);border-top:1px solid var(--bd);z-index:5}
+nav button{flex:1;border:0;background:none;color:var(--mu);padding:12px 4px;min-height:48px;font:inherit;cursor:pointer}
+nav button.on{color:var(--ac);font-weight:600}
+button,.btn{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:10px 14px;min-height:44px;text-decoration:none;display:inline-block}
+button.p,.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}
+button.d{color:var(--ac);border-color:var(--ac)}.btn.off{opacity:.4;pointer-events:none}
+input,select,textarea{font:inherit;width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);min-height:44px}
+label{display:block;font-size:13px;color:var(--mu);margin:8px 0}label input,label select,label textarea{margin-top:4px;color:var(--tx)}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}.card b{font-size:26px;color:var(--ac);display:block}.card span{font-size:12px;color:var(--mu)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.row>*{flex:1}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px}.form .w{grid-column:1/-1}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;color:var(--mu)}td,th{padding:10px 8px;border-bottom:1px solid var(--bd)}
+a{color:var(--ac);cursor:pointer}.pill{border-radius:99px;padding:4px 12px;min-height:32px;font-size:13px}.pill.ok{color:var(--ok);border-color:var(--ok)}.pill.no{color:var(--no);border-color:var(--no)}
+.tag{background:var(--ac2);color:var(--ac);border-radius:8px;padding:2px 8px;font-weight:600}.empty{text-align:center;color:var(--mu);padding:40px}.note{font-size:12px;color:var(--mu)}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;padding:10px 16px;border-radius:10px;z-index:99;animation:f .2s}.toast.bad{background:var(--ac)}
+@keyframes f{from{opacity:0;transform:translate(-50%,-6px)}}
+.box{max-width:380px;margin:12vh auto;padding:20px}
+@media(max-width:700px){table,tbody,tr,td{display:block}thead{display:none}tr{border:1px solid var(--bd);border-radius:12px;padding:10px;margin:8px 0}td{border:0;padding:2px 0}.g4{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><div id="app"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ===== STEP 1: paste your Firebase web config here (Firebase Console > Project settings > Your apps) =====
+const firebaseConfig={apiKey:"AIzaSyDJyaD71cUeHGglpM4vdhyhNpNrendFEo8",authDomain:"myblood-circle.firebaseapp.com",projectId:"myblood-circle",storageBucket:"myblood-circle.firebasestorage.app",messagingSenderId:"764606278445",appId:"1:764606278445:web:063a4d702e29ac978981a4"};
+// ========================================================================================================
+const NOCFG=firebaseConfig.apiKey.startsWith("PASTE");
+const BG=["A+","A-","B+","B-","AB+","AB-","O+","O-"];
+const T={en:{dash:"Dashboard",donors:"Donors",add:"Add donor",settings:"Settings",email:"Email",pw:"Password",signin:"Sign in",signout:"Sign out",total:"Total donors",avail:"Available",unavail:"Unavailable",name:"Full name",father:"Father's name",phone:"Phone",village:"Village / locality",union:"Union",upazila:"Upazila",district:"District",address:"Full address",fb:"Facebook URL",wa:"WhatsApp (number or link)",group:"Blood group",last:"Last donation",count:"Donations",status:"Status",notes:"Private notes",consent:"Donor has given consent",save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",search:"Search name, ID, phone, area…",any:"Any",empty:"No donors found",recentDon:"Recent donations",recentAdd:"Recently added",rec:"Record donation",date:"Date",place:"Hospital / place",ref:"Recipient reference (optional)",call:"Call",mail:"Email",history:"Donation history",dup:"Another donor has this phone:",lang:"Language",theme:"Theme",appname:"App name",light:"Light",dark:"Dark",availNote:"Availability shows the donor's stated willingness only. It is not medical eligibility.",sens:"Exported files contain sensitive personal data. Keep them private.",more:"Load more",expD:"Export donors CSV",expH:"Export donations CSV",imp:"Import donors CSV",nocfg:"Firebase is not configured yet. Paste your config in index.html.",denied:"Permission denied. Check Firestore rules and admin UID.",neterr:"Database error",badlogin:"Wrong email or password",qd:"Open a donor and press 'Record donation'.",saved:"Saved",confirmDel:"Delete this donor AND all their donation records? This cannot be undone.",confirmDon:"Delete this donation record? Totals will be recalculated.",invalid:"Invalid",local:"Saved on this device only."},
+bn:{dash:"ড্যাশবোর্ড",donors:"দাতা",add:"দাতা যোগ",settings:"সেটিংস",email:"ইমেইল",pw:"পাসওয়ার্ড",signin:"সাইন ইন",signout:"সাইন আউট",total:"মোট দাতা",avail:"উপলব্ধ",unavail:"অনুপলব্ধ",name:"পূর্ণ নাম",father:"পিতার নাম",phone:"ফোন",village:"গ্রাম / এলাকা",union:"ইউনিয়ন",upazila:"উপজেলা",district:"জেলা",address:"পূর্ণ ঠিকানা",fb:"ফেসবুক লিংক",wa:"হোয়াটসঅ্যাপ (নম্বর বা লিংক)",group:"রক্তের গ্রুপ",last:"সর্বশেষ দান",count:"দান সংখ্যা",status:"অবস্থা",notes:"ব্যক্তিগত নোট",consent:"দাতা সম্মতি দিয়েছেন",save:"সংরক্ষণ",cancel:"বাতিল",del:"মুছুন",edit:"সম্পাদনা",search:"নাম, আইডি, ফোন, এলাকা খুঁজুন…",any:"যেকোনো",empty:"কোনো দাতা পাওয়া যায়নি",recentDon:"সাম্প্রতিক দান",recentAdd:"সম্প্রতি যোগ হয়েছে",rec:"দান নথিভুক্ত করুন",date:"তারিখ",place:"হাসপাতাল / স্থান",ref:"গ্রহীতার রেফারেন্স (ঐচ্ছিক)",call:"কল",mail:"ইমেইল",history:"দানের ইতিহাস",dup:"এই ফোন নম্বর অন্য দাতার আছে:",lang:"ভাষা",theme:"থিম",appname:"অ্যাপের নাম",light:"লাইট",dark:"ডার্ক",availNote:"উপলব্ধ মানে দাতার জানানো ইচ্ছা মাত্র। এটি চিকিৎসাগত যোগ্যতা নয়।",sens:"এক্সপোর্ট করা ফাইলে ব্যক্তিগত তথ্য আছে। এটি গোপন রাখুন।",more:"আরও দেখুন",expD:"দাতার CSV এক্সপোর্ট",expH:"দানের CSV এক্সপোর্ট",imp:"দাতার CSV ইমপোর্ট",nocfg:"Firebase এখনো সেট করা হয়নি। index.html-এ কনফিগ বসান।",denied:"অনুমতি নেই। Firestore নিয়ম ও অ্যাডমিন UID দেখুন।",neterr:"ডাটাবেস ত্রুটি",badlogin:"ইমেইল বা পাসওয়ার্ড ভুল",qd:"একজন দাতা খুলে 'দান নথিভুক্ত করুন' চাপুন।",saved:"সংরক্ষিত",confirmDel:"এই দাতা এবং তার সব দানের রেকর্ড মুছে যাবে। এটি ফেরানো যাবে না। নিশ্চিত?",confirmDon:"এই দানের রেকর্ড মুছবেন? মোট সংখ্যা নতুন করে গণনা হবে।",invalid:"ভুল",local:"শুধু এই ডিভাইসে সংরক্ষিত।"}};
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}};
+const S={user:undefined,donors:[],recent:[],dons:[],view:"dash",param:null,q:"",f:{g:"",u:"",a:""},page:1,lang:ls("bl_lang")||"en",theme:ls("bl_theme")||"light",appName:ls("bl_name")||"BloodLink BD"};
+const t=k=>(T[S.lang][k]||k);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const J=a=>a.join("");const $=s=>document.querySelector(s);
+function toast(m,bad){const e=document.createElement("div");e.className="toast"+(bad?" bad":"");e.textContent=m;document.body.append(e);setTimeout(()=>e.remove(),3500)}
+const W=f=>async(...a)=>{try{await f(...a)}catch(e){console.error(e);toast(e.code==="permission-denied"?t("denied"):t("neterr")+": "+(e.message||e),1)}};
+let db,auth;
+if(!NOCFG){firebase.initializeApp(firebaseConfig);auth=firebase.auth();db=firebase.firestore();
+ auth.onAuthStateChanged(W(async u=>{S.user=u;if(u)await load();render()}))}else{S.user=null}
+const load=async()=>{const [a,b]=await Promise.all([db.collection("donors").orderBy("createdAt","desc").get(),db.collection("donations").orderBy("date","desc").limit(5).get()]);S.donors=a.docs.map(d=>d.data());S.recent=b.docs.map(d=>d.data())};
+
+// ---------- helpers ----------
+function normPhone(p){let d=String(p||"").replace(/[^\d+]/g,"").replace(/\+/g,"");if(d.startsWith("880"))d=d.slice(3);if(d.startsWith("0"))d=d.slice(1);return "+880"+d}
+const okPhone=p=>/^\+8801[3-9]\d{8}$/.test(p);
+const okUrl=u=>/^https?:\/\/\S+\.\S+/.test(u);const okMail=e=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
+function validate(f){if(!f.name.trim())return t("name")+": "+t("invalid");if(!okPhone(normPhone(f.phone)))return t("phone")+": "+t("invalid")+" (01XXXXXXXXX)";
+ if(!BG.includes(f.bloodGroup))return t("group")+": "+t("invalid");if(!f.district.trim())return t("district")+": "+t("invalid");
+ if(f.facebook&&!okUrl(f.facebook))return t("fb")+": "+t("invalid");if(f.email&&!okMail(f.email))return t("email")+": "+t("invalid");return ""}
+const FIELDS=["name","father","phone","village","union","upazila","district","address","facebook","whatsapp","email","bloodGroup","notes"];
+function buildRec(f,old={}){const r={};FIELDS.forEach(k=>r[k]=(f[k]||"").trim());r.phone=normPhone(r.phone);
+ if(r.whatsapp&&!okUrl(r.whatsapp))r.whatsapp=normPhone(r.whatsapp);r.nameLower=r.name.toLowerCase();
+ r.consent=!!(f.consent==="on"||f.consent===true||f.consent==="true");r.consentDate=r.consent?(old.consentDate||new Date().toISOString().slice(0,10)):"";return r}
+async function createDonor(rec){const ref=db.collection("meta").doc("counter");let id;const now=Date.now();
+ await db.runTransaction(async tx=>{const s=await tx.get(ref);const n=(s.exists?s.data().n:0)+1;id="BL-"+String(n).padStart(4,"0");
+  tx.set(ref,{n});tx.set(db.collection("donors").doc(id),{...rec,id,totalDonations:0,lastDonation:"",available:true,createdAt:now,updatedAt:now})});return id}
+function csv(rows,cols){const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';return "\ufeff"+[cols.join(","),...rows.map(r=>cols.map(c=>q(r[c])).join(","))].join("\n")}
+function dl(name,txt){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/csv"}));a.download=name;a.click()}
+function parseCSV(s){s=s.replace(/^\ufeff/,"");const r=[];let row=[],c="",q=0;for(let i=0;i<s.length;i++){const ch=s[i];
+ if(q){if(ch=='"'){if(s[i+1]=='"'){c+='"';i++}else q=0}else c+=ch}else if(ch=='"')q=1;else if(ch==","){row.push(c);c=""}else if(ch=="\n"){row.push(c.replace(/\r$/,""));r.push(row);row=[];c=""}else c+=ch}
+ if(c||row.length){row.push(c.replace(/\r$/,""));r.push(row)}return r.filter(x=>x.join("").trim())}
+
+// ---------- views ----------
+const go=(v,p)=>{S.view=v;S.param=p;if(v==="donors")S.page=1;render();scrollTo(0,0)};
+function render(){document.documentElement.dataset.t=S.theme;document.documentElement.lang=S.lang;const a=$("#app");
+ if(NOCFG){a.innerHTML=`<div class=box><h2>🩸 ${esc(S.appName)}</h2><p>${t("nocfg")}</p></div>`;return}
+ if(S.user===undefined){a.innerHTML='<p class=empty>…</p>';return}
+ if(!S.user){a.innerHTML=`<div class=box><h2>🩸 ${esc(S.appName)}</h2><form onsubmit="login(event)"><label>${t("email")}<input name=e type=email required autocomplete=username></label><label>${t("pw")}<input name=p type=password required autocomplete=current-password></label><button class=p style="width:100%;margin-top:8px">${t("signin")}</button></form></div>`;return}
+ const v={dash:dashV,donors:donorsV,form:formV,profile:profileV,settings:setV}[S.view]();
+ const nb=(k,l)=>`<button class="${S.view===k?"on":""}" onclick="go('${k}')">${t(l)}</button>`;
+ a.innerHTML=`<header><b>🩸 ${esc(S.appName)}</b><button onclick="auth.signOut()">${t("signout")}</button></header><main>${v}</main><nav>${nb("dash","dash")}${nb("donors","donors")}<button class="${S.view==="form"?"on":""}" onclick="go('form')">＋ ${t("add")}</button>${nb("settings","settings")}</nav>`}
+const login=W(async e=>{e.preventDefault();const f=e.target;try{await auth.signInWithEmailAndPassword(f.e.value,f.p.value)}catch(x){toast(t("badlogin"),1)}});
+const stat=(l,n)=>`<div class=card><b>${n}</b><span>${l}</span></div>`;
+function dashV(){const D=S.donors,av=D.filter(d=>d.available).length;const nm=id=>(D.find(d=>d.id===id)||{}).name||id;
+ return `<div class=g3>${stat(t("total"),D.length)}${stat(t("avail"),av)}${stat(t("unavail"),D.length-av)}</div>
+ <div class=row><input placeholder="${t("search")}" onkeydown="if(event.key=='Enter'){S.q=this.value;go('donors')}"></div>
+ <div class=row><button class=p onclick="go('form')">＋ ${t("add")}</button><button onclick="toast(t('qd'));go('donors')">${t("rec")}</button></div>
+ <div class=g4>${J(BG.map(g=>stat(g,D.filter(d=>d.bloodGroup===g).length)))}</div>
+ <h3>${t("recentDon")}</h3>${S.recent.length?J(S.recent.map(r=>`<div class=card style="margin:6px 0"><a onclick="openP('${esc(r.donorId)}')">${esc(nm(r.donorId))}</a> · ${esc(r.date)} · ${esc(r.place)}</div>`)):`<p class=note>—</p>`}
+ <h3>${t("recentAdd")}</h3>${D.length?J(D.slice(0,5).map(d=>`<div class=card style="margin:6px 0"><span class=tag>${esc(d.bloodGroup)}</span> <a onclick="openP('${d.id}')">${esc(d.name)}</a> · ${d.id}</div>`)):`<p class=note>—</p>`}`}
+function filtered(){const q=S.q.trim().toLowerCase(),u=S.f.u.trim().toLowerCase();
+ return S.donors.filter(d=>(!S.f.g||d.bloodGroup===S.f.g)&&(!S.f.a||(d.available?"a":"u")===S.f.a)&&(!u||(d.upazila||"").toLowerCase().includes(u))&&
+ (!q||[d.name,d.id,d.phone,d.bloodGroup,d.village,d.union,d.upazila,d.district].join(" ").toLowerCase().includes(q)))}
+function resV(){const L=filtered(),sh=L.slice(0,S.page*25);if(!L.length)return `<div class=empty>🩸<p>${t("empty")}</p></div>`;
+ return `<table><thead><tr><th>ID<th>${t("name")}<th>${t("group")}<th>${t("phone")}<th>${t("upazila")}<th>${t("count")}<th>${t("status")}</tr></thead><tbody>${J(sh.map(d=>`<tr><td>${d.id}<td><a onclick="openP('${d.id}')">${esc(d.name)}</a><td><span class=tag>${esc(d.bloodGroup)}</span><td>${esc(d.phone)}<td>${esc(d.upazila)}<td>${d.totalDonations||0}<td><button class="pill ${d.available?"ok":"no"}" onclick="tog('${d.id}')">${d.available?t("avail"):t("unavail")}</button></tr>`))}</tbody></table>${L.length>sh.length?`<p style="text-align:center"><button onclick="S.page++;$('#res').innerHTML=resV()">${t("more")} (${L.length-sh.length})</button></p>`:""}`}
+function donorsV(){const re=()=>"$('#res').innerHTML=resV()";
+ return `<div class=row><input value="${esc(S.q)}" placeholder="${t("search")}" oninput="S.q=this.value;S.page=1;${re()}"></div>
+ <div class=row><select onchange="S.f.g=this.value;S.page=1;${re()}"><option value="">${t("group")}: ${t("any")}</option>${J(BG.map(g=>`<option ${S.f.g===g?"selected":""}>${g}</option>`))}</select>
+ <input value="${esc(S.f.u)}" placeholder="${t("upazila")}" oninput="S.f.u=this.value;S.page=1;${re()}">
+ <select onchange="S.f.a=this.value;S.page=1;${re()}"><option value="">${t("status")}: ${t("any")}</option><option value=a ${S.f.a==="a"?"selected":""}>${t("avail")}</option><option value=u ${S.f.a==="u"?"selected":""}>${t("unavail")}</option></select></div>
+ <p class=note>${t("availNote")}</p><div id=res>${resV()}</div>`}
+function formV(){const d=S.donors.find(x=>x.id===S.param)||{};const i=(k,l,ty="text",r)=>`<label>${t(l)}${r?" *":""}<input name=${k} type=${ty} value="${esc(d[k])}" ${r?"required":""}></label>`;
+ return `<h2>${d.id?t("edit")+" · "+d.id:t("add")}</h2><form class=form onsubmit="saveD(event,'${d.id||""}')">${i("name","name","text",1)}${i("father","father")}${i("phone","phone","tel",1)}
+ <label>${t("group")} *<select name=bloodGroup required><option value="">–</option>${J(BG.map(g=>`<option ${d.bloodGroup===g?"selected":""}>${g}</option>`))}</select></label>
+ ${i("village","village")}${i("union","union")}${i("upazila","upazila")}${i("district","district","text",1)}${i("address","address")}${i("facebook","fb","url")}${i("whatsapp","wa")}${i("email","email","email")}
+ <label class=w>${t("notes")}<textarea name=notes>${esc(d.notes)}</textarea></label><label class=w><input type=checkbox name=consent style="width:auto;min-height:0" ${d.consent?"checked":""}> ${t("consent")}${d.consentDate?" ("+d.consentDate+")":""}</label>
+ <div class="w row"><button class=p>${t("save")}</button><button type=button onclick="go('${d.id?"profile":"donors"}','${d.id||""}')">${t("cancel")}</button></div></form>`}
+function profileV(){const d=S.donors.find(x=>x.id===S.param);if(!d)return `<div class=empty>${t("empty")}</div>`;
+ const ln=(h,l)=>`<a class="btn ${h?"":"off"}" ${h?`href="${esc(h)}" target=_blank rel=noopener`:""}>${l}</a>`;
+ const wa=d.whatsapp?(okUrl(d.whatsapp)?d.whatsapp:"https://wa.me/"+d.whatsapp.replace(/\D/g,"")):"";
+ const kv=(k,v)=>v?`<tr><td class=note>${t(k)}<td>${esc(v)}</tr>`:"";
+ return `<h2>${esc(d.name)} <span class=tag>${esc(d.bloodGroup)}</span></h2><p class=note>${d.id}</p>
+ <div class=row>${ln("tel:"+d.phone,"📞 "+t("call"))}${ln(wa,"WhatsApp")}${ln(okUrl(d.facebook||"")?d.facebook:"","Facebook")}${ln(d.email?"mailto:"+d.email:"","✉ "+t("mail"))}</div>
+ <div class=row><button class="pill ${d.available?"ok":"no"}" onclick="tog('${d.id}')">${d.available?t("avail"):t("unavail")}</button><button onclick="go('form','${d.id}')">${t("edit")}</button><button class=d onclick="delD('${d.id}')">${t("del")}</button></div>
+ <p class=note>${t("availNote")}</p><div class=card><table><tbody>${kv("phone",d.phone)}${kv("father",d.father)}${kv("village",d.village)}${kv("union",d.union)}${kv("upazila",d.upazila)}${kv("district",d.district)}${kv("address",d.address)}${kv("email",d.email)}${kv("notes",d.notes)}${kv("count",String(d.totalDonations||0))}${kv("last",d.lastDonation)}${kv("consent",d.consent?"✔ "+d.consentDate:"")}</tbody></table></div>
+ <h3>${t("rec")}</h3><form class=form onsubmit="addDon(event,'${d.id}')"><label>${t("date")}<input name=date type=date required max="${new Date().toISOString().slice(0,10)}"></label><label>${t("place")}<input name=place required></label><label>${t("ref")}<input name=recipient></label><label>${t("notes")}<input name=notes></label><div class=w><button class=p>${t("save")}</button></div></form>
+ <h3>${t("history")}</h3>${S.dons.length?`<table><tbody>${J(S.dons.map(x=>`<tr><td>${esc(x.date)}<td>${esc(x.place)}<td>${esc(x.recipient)}<td><button class=d onclick="delDon('${x.id}','${d.id}')">${t("del")}</button></tr>`))}</tbody></table>`:`<p class=note>—</p>`}`}
+function setV(){return `<h2>${t("settings")}</h2><label>${t("lang")}<select onchange="S.lang=this.value;ls('bl_lang',S.lang);render()"><option value=en ${S.lang==="en"?"selected":""}>English</option><option value=bn ${S.lang==="bn"?"selected":""}>বাংলা</option></select></label>
+ <label>${t("theme")}<select onchange="S.theme=this.value;ls('bl_theme',S.theme);render()"><option value=light ${S.theme==="light"?"selected":""}>${t("light")}</option><option value=dark ${S.theme==="dark"?"selected":""}>${t("dark")}</option></select></label>
+ <label>${t("appname")}<input value="${esc(S.appName)}" onchange="S.appName=this.value||'BloodLink BD';ls('bl_name',S.appName);render()"></label><p class=note>${t("local")}</p>
+ <p class=note>⚠ ${t("sens")}</p><div class=row><button onclick="expD()">${t("expD")}</button><button onclick="expH()">${t("expH")}</button></div><label>${t("imp")}<input type=file accept=".csv" onchange="impD(this)"></label>`}
+
+// ---------- actions ----------
+const openP=W(async id=>{const s=await db.collection("donations").where("donorId","==",id).get();S.dons=s.docs.map(x=>x.data()).sort((a,b)=>b.date.localeCompare(a.date));go("profile",id)});
+const saveD=W(async(e,id)=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));const err=validate(f);if(err)return toast(err,1);
+ const old=S.donors.find(d=>d.id===id)||{};const rec=buildRec(f,old);const dup=S.donors.find(d=>d.phone===rec.phone&&d.id!==id);
+ if(dup&&!confirm(t("dup")+" "+dup.name+" ("+dup.id+")"))return;
+ if(id){await db.collection("donors").doc(id).update({...rec,updatedAt:Date.now()})}else{id=await createDonor(rec)}
+ await load();toast(t("saved"));await openP(id)});
+const tog=W(async id=>{const d=S.donors.find(x=>x.id===id);await db.collection("donors").doc(id).update({available:!d.available,updatedAt:Date.now()});d.available=!d.available;
+ if(S.view==="donors")$("#res").innerHTML=resV();else render()});
+const delD=W(async id=>{if(!confirm(t("confirmDel")))return;const s=await db.collection("donations").where("donorId","==",id).get();const b=db.batch();s.docs.forEach(x=>b.delete(x.ref));b.delete(db.collection("donors").doc(id));await b.commit();await load();toast(t("saved"));go("donors")});
+async function recompute(id,extra,skip){const s=await db.collection("donations").where("donorId","==",id).get();const all=s.docs.map(x=>x.data()).filter(x=>x.status==="completed"&&x.id!==skip);if(extra)all.push(extra);
+ return {totalDonations:all.length,lastDonation:all.map(x=>x.date).sort().pop()||"",updatedAt:Date.now()}}
+const addDon=W(async(e,id)=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));if(!f.date||!f.place.trim())return toast(t("invalid"),1);
+ const ref=db.collection("donations").doc();const rec={id:ref.id,donorId:id,date:f.date,place:f.place.trim(),recipient:(f.recipient||"").trim(),notes:(f.notes||"").trim(),status:"completed",createdAt:Date.now()};
+ const upd=await recompute(id,rec);const b=db.batch();b.set(ref,rec);b.update(db.collection("donors").doc(id),upd);await b.commit();await load();toast(t("saved"));await openP(id)});
+const delDon=W(async(did,id)=>{if(!confirm(t("confirmDon")))return;const upd=await recompute(id,null,did);const b=db.batch();b.delete(db.collection("donations").doc(did));b.update(db.collection("donors").doc(id),upd);await b.commit();await load();await openP(id)});
+const expD=()=>dl("donors.csv",csv(S.donors,["id",...FIELDS,"available","totalDonations","lastDonation","consent","consentDate","createdAt"]));
+const expH=W(async()=>{const s=await db.collection("donations").get();dl("donations.csv",csv(s.docs.map(x=>x.data()),["id","donorId","date","place","recipient","notes","status","createdAt"]))});
+const impD=W(async inp=>{const file=inp.files[0];if(!file)return;const rows=parseCSV(await file.text());const h=rows.shift()||[];let ok=0,bad=0,dup=0;const seen=new Set(S.donors.map(d=>d.phone));
+ for(const r of rows){const f={};h.forEach((k,i)=>f[k.trim()]=r[i]||"");f.name=f.name||"";f.phone=f.phone||"";f.bloodGroup=f.bloodGroup||"";f.district=f.district||"";f.consent=f.consent==="true"?"on":"";
+  if(validate(f)){bad++;continue}const rec=buildRec(f);if(seen.has(rec.phone)){dup++;continue}seen.add(rec.phone);await createDonor(rec);ok++}
+ await load();inp.value="";toast(`Imported ${ok} · duplicates skipped ${dup} · invalid ${bad}`,bad>0)});
+render();
+</script></body></html>
